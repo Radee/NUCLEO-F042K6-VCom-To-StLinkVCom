@@ -36,6 +36,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "usercallbacks.h"
+#include "cyclicbuffer.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -114,18 +115,24 @@ int main(void)
   //HAL_UART_Transmit(&huart2,OK,4,9000);
   HAL_UART_Receive_IT(&huart2,uartpData,uartpDataSize);
 
-  int index = 25;
-  int n = 0;
-  char b[32];
-  memset(b,32,0x00);
-  itoa(index,b,10);
-  n=strlen(b);
+	char tempBuffer[CYCLIC_LEN+1];
+	memset(tempBuffer,0x00,CYCLIC_LEN+1);
+	int l = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if(detectChange()){
+		  while(CDC_CheckIf_Busy()!=0){
+			  waitMs(5);
+		  }
+
+		  readCyclic(tempBuffer,&l);
+		  CDC_Transmit_FS(tempBuffer,l);
+	  }
+	  /*
 	  if(0!=usbinitialized){
 		  memset(b,0x00,32);
 		  itoa(index,b,10);
@@ -138,6 +145,7 @@ int main(void)
 		  CDC_Transmit_FS(b,n+2);
 		  index++;
 	  }
+	  */
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */

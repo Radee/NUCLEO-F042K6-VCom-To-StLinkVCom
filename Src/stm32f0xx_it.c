@@ -85,30 +85,26 @@ void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
 	uint8_t recieved = 0;
-	uint8_t n,i;
-	uint8_t* b = getUartRxBuffer(0);
-	uint8_t* start = (&huart2)->pRxBuffPtr;
-/*
+	char c = 0;
+
 	if(0 != ((&huart2)->Instance->ISR & UART_IT_RXNE) )
 	{
 		recieved = 1;
 	}
-*/
+	/*
 	if(0!=__HAL_UART_GET_FLAG((&huart2),UART_FLAG_RXNE)){
 		recieved = 1;
 	}
+	*/
 
   /* USER CODE END USART2_IRQn 0 */
 
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
-  char c = ((&huart2)->pRxBuffPtr-1)[0];
-
-  if (0 != CDC_Transmit_FS(((&huart2)->pRxBuffPtr-1),1)){
-	  i = 0;
-	  i++;
-  }
-
+	  if (1 == recieved){
+		  c = ((&huart2)->pRxBuffPtr-1)[0];
+		  writeChar(c);
+	  }
   /* USER CODE END USART2_IRQn 1 */
 }
 
