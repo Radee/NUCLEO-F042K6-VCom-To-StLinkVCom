@@ -124,7 +124,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(detectChange()){
+	  if(detectChange() && 1==usbinitialized){
 		  while(CDC_CheckIf_Busy()!=0){
 			  waitMs(5);
 		  }

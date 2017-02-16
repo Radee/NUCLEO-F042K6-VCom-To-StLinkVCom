@@ -36,8 +36,9 @@
 #include "stm32f0xx_it.h"
 
 /* USER CODE BEGIN 0 */
-extern uint8_t* getUartRxBuffer(uint8_t i);
+#include "cyclicbuffer.h"
 
+extern uint8_t* getUartRxBuffer(uint8_t i);
 unsigned int wait=0;
 
 void waitMs(unsigned int toWait){
@@ -84,26 +85,29 @@ void SysTick_Handler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
+	uint8_t* buffer = getUartRxBuffer(0);
 	uint8_t recieved = 0;
+	static uint8_t debug_i = 0;
 	char c = 0;
 
-	if(0 != ((&huart2)->Instance->ISR & UART_IT_RXNE) )
+	if((0 != ((&huart2)->Instance->ISR & UART_IT_RXNE) ) && (0!=__HAL_UART_GET_FLAG((&huart2),UART_FLAG_RXNE)) )
 	{
 		recieved = 1;
 	}
-	/*
-	if(0!=__HAL_UART_GET_FLAG((&huart2),UART_FLAG_RXNE)){
-		recieved = 1;
-	}
-	*/
 
   /* USER CODE END USART2_IRQn 0 */
 
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
 	  if (1 == recieved){
-		  c = ((&huart2)->pRxBuffPtr-1)[0];
+		  if((&huart2)->pRxBuffPtr>buffer){
+			  c = ((&huart2)->pRxBuffPtr-1)[0];
+		  }else{
+			  c = buffer[(&huart2)->RxXferSize-1];
+		  }
 		  writeChar(c);
+
+		  debug_i++;
 	  }
   /* USER CODE END USART2_IRQn 1 */
 }

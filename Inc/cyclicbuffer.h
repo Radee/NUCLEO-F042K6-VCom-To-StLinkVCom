@@ -10,7 +10,7 @@
 
 #include "stdint.h"
 
-#define CYCLIC_LEN 16
+#define CYCLIC_LEN 32
 
 #ifdef __cplusplus
 	extern "C" {
