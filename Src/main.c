@@ -111,8 +111,6 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-  //uint8_t* OK = "OK\r\n";
-  //HAL_UART_Transmit(&huart2,OK,4,9000);
   HAL_UART_Receive_IT(&huart2,uartpData,uartpDataSize);
 
 	char tempBuffer[CYCLIC_LEN+1];
@@ -124,28 +122,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  //if data was added to cyclic buffer and cdc was initialized
 	  if(detectChange() && 1==usbinitialized){
+		  //protects vcom from blocking
 		  while(CDC_CheckIf_Busy()!=0){
 			  waitMs(5);
 		  }
-
+		  //read cyclic buffer
 		  readCyclic(tempBuffer,&l);
+		  //transmit newest information
 		  CDC_Transmit_FS(tempBuffer,l);
 	  }
-	  /*
-	  if(0!=usbinitialized){
-		  memset(b,0x00,32);
-		  itoa(index,b,10);
-		  n=strlen(b);
-		  b[n]='\n';
-		  b[n+1]='\r';
-		  while(CDC_CheckIf_Busy()!=0){
-			  waitMs(5);
-		  }
-		  CDC_Transmit_FS(b,n+2);
-		  index++;
-	  }
-	  */
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
